@@ -1,0 +1,32 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:orientation="vertical"
+    android:layout_height="match_parent"
+    android:background="@color/default_page">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?actionBarSize"
+        android:background="@color/toolbar"/>
+
+    <net.soulwolf.widget.pulltozoom.PullToZoomLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:id="@+id/pic"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:scaleType="centerCrop"/>
+
+        <ListView
+            android:id="@+id/listview"
+            android:divider="@android:color/darker_gray"
+            android:dividerHeight="0.1dp"
+            android:background="@color/default_page"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+    </net.soulwolf.widget.pulltozoom.PullToZoomLayout>
+</LinearLayout>
