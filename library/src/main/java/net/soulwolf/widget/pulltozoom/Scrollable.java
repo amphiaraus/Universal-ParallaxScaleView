@@ -24,4 +24,8 @@ package net.soulwolf.widget.pulltozoom;
  */
 public interface Scrollable {
 
+    public int getCurrentScrollY();
+
+    public boolean canScrollToTop();
+
 }
