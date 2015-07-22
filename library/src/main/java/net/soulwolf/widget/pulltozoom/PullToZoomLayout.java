@@ -24,9 +24,12 @@ import android.content.res.TypedArray;
 import android.os.Build;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
+import android.view.VelocityTracker;
 import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
+import android.widget.Scroller;
 
 import com.toaker.common.tlog.TLog;
 
@@ -61,8 +64,6 @@ public class PullToZoomLayout extends ViewGroup {
 
     private boolean mPullZooming     = false;
 
-    private boolean mDropDowning     = false;
-
     private int     mScaledTouchSlop;
 
     private float   mInitializeTouchX;
@@ -81,7 +82,13 @@ public class PullToZoomLayout extends ViewGroup {
 
     private Scrollable mScrollable;
 
+    private Scroller mScroller;
+
+    private VelocityTracker velocityTracker;
+
     private PullToZoomAnimator mPullToZoomAnimator;
+
+    private int SNAP_VELOCITY = 50;
 
     public PullToZoomLayout(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -104,6 +111,7 @@ public class PullToZoomLayout extends ViewGroup {
 
         styleArray.recycle();
         mScaledTouchSlop = ViewConfiguration.get(context).getScaledTouchSlop();
+        mScroller = new Scroller(context);
     }
 
     @Override
@@ -190,7 +198,7 @@ public class PullToZoomLayout extends ViewGroup {
             switch (ev.getAction()){
                 case MotionEvent.ACTION_CANCEL:
                 case MotionEvent.ACTION_UP:
-                    mIntercept = mDropDowning = false;
+                    mIntercept = false;
                     break;
 
                 case MotionEvent.ACTION_DOWN:
@@ -198,31 +206,44 @@ public class PullToZoomLayout extends ViewGroup {
                     mInitializeTouchY = ev.getY();
                     mLastTouchX = mInitializeTouchX;
                     mLastTouchY = mInitializeTouchY;
-                    mIntercept = mDropDowning = false;
+                    mIntercept = false;
                     break;
 
                 case MotionEvent.ACTION_MOVE:
-
-                    if(canScrollToTop() || isZoomViewVisibility()){
-                        final float offset = ev.getY() - mLastTouchY;
-                        final float scopeOffset = ev.getX()  - mLastTouchX;
-                        if (Math.abs(offset) > mScaledTouchSlop
-                                && Math.abs(offset) > Math.abs(scopeOffset)) {
-                            if (offset >= 1.0f || offset <= -1.0f) {
+                    final float offset = ev.getY() - mLastTouchY;
+                    final float scopeOffset = ev.getX()  - mLastTouchX;
+                    if (Math.abs(offset) > mScaledTouchSlop
+                            && Math.abs(offset) > Math.abs(scopeOffset)
+                            && Math.abs(offset) > 1.0F) {
+                        if(offset > 0){
+                            if(canScrollToTop()){
                                 mLastTouchX  = ev.getX();
                                 mLastTouchY = ev.getY();
-                                mIntercept = mDropDowning = true;
+                                mIntercept = true;
+                            }
+                        }else {
+                            if(!isContentToTop()){
+                                mIntercept = false;
+                            }else {
+                                mLastTouchX  = ev.getX();
+                                mLastTouchY = ev.getY();
+                                mIntercept = true;
                             }
                         }
                     }
                     break;
             }
         }
+        TLog.e(LOG_TAG, "scroll:%s", mScrollable.getCurrentScrollY());
         return mIntercept;
     }
 
-    private boolean isContentScrollable(){
-        return mContentView.getTop() >= 0;
+    private boolean isContentToTop(){
+        return mContentView.getTop() > 0;
+    }
+
+    private boolean isContentToBottom(){
+        return mContentView.getTop() < mZoomViewHeight;
     }
 
     public boolean isZoomViewVisibility() {
@@ -230,13 +251,34 @@ public class PullToZoomLayout extends ViewGroup {
     }
 
     @Override
+    public boolean dispatchTouchEvent(MotionEvent ev) {
+        return super.dispatchTouchEvent(ev);
+    }
+
+    @Override
     public boolean onTouchEvent(MotionEvent ev) {
         if(isPullZoomEnabled()){
+            addVelocityTracker(ev);
             switch (ev.getAction()){
                 case MotionEvent.ACTION_CANCEL:
                 case MotionEvent.ACTION_UP:
-                    if(mDropDowning){
-                        mDropDowning = false;
+                    if(DEBUG){
+                        TLog.d(LOG_TAG,"ACTION_CANCEL ACTION_UP");
+                    }
+                    if(!isPullZooming()){
+                        int velocityY = getScrollVelocity();
+                        if (velocityY > SNAP_VELOCITY) {
+                            int dx = mZoomViewHeight - mContentView.getTop() * 2;
+                            mScroller.startScroll(0,mContentView.getTop(),0,dx,Math.abs(dx));
+                        } else if (velocityY < -SNAP_VELOCITY) {
+                            int dx = mContentView.getTop() - mZoomViewHeight  * 2;
+                            mScroller.startScroll(0, mContentView.getTop(), 0,dx,Math.abs(dx));
+                        }
+                    }
+                    postInvalidate();
+                    recycleVelocityTracker();
+                    if(mIntercept){
+                        mIntercept = false;
                         if(isPullZooming()){
                             pullToZoomRebound();
                         }
@@ -246,29 +288,47 @@ public class PullToZoomLayout extends ViewGroup {
                     break;
 
                 case MotionEvent.ACTION_DOWN:
-                    if((canScrollToTop() || isZoomViewVisibility()) && ev.getEdgeFlags() == 0){
+                    if(ev.getEdgeFlags() == 0){
+                        return false;
+                    }
+                    if(!mScroller.isFinished()){
+                        mScroller.abortAnimation();
+                    }
+                    if(canScrollToTop()){
                         mInitializeTouchX = ev.getX();
                         mInitializeTouchY = ev.getY();
                         mLastTouchX = mInitializeTouchX;
                         mLastTouchY = mInitializeTouchY;
                         return true;
                     }
+                    if(DEBUG){
+                        TLog.d(LOG_TAG,"ACTION_DOWN");
+                    }
                     break;
 
                 case MotionEvent.ACTION_MOVE:
+                    if(DEBUG){
+                        TLog.d(LOG_TAG,"ACTION_MOVE");
+                    }
                     mLastTouchX = ev.getX();
                     mLastTouchY = ev.getY();
                     float offset = mLastTouchY - mInitializeTouchY;
-                    if(mDropDowning){
+                    if(mIntercept){
                         if(DEBUG){
                             TLog.d(LOG_TAG,"scrollOffset:%s",offset);
                         }
                         if(offset > 0){
-                            pullToZoom(Math.round(Math.max(offset,0) / 2));
+                            if(isContentToBottom()){
+                                scrollContentView((int) (offset * 0.058F));
+                            }else {
+                                pullToZoom(Math.round(Math.max(offset,0) / 2));
+                                mPullZooming = true;
+                            }
                         }else {
-                            scrollContentView((int) (offset / 10));
+                            if(isContentToTop()){
+                                scrollContentView((int) (offset * 0.058F));
+                            }
                         }
-                        mPullZooming = true;
                         return true;
                     }
                     break;
@@ -278,7 +338,39 @@ public class PullToZoomLayout extends ViewGroup {
         return false;
     }
 
+    private void addVelocityTracker(MotionEvent event) {
+        if (velocityTracker == null) {
+            velocityTracker = VelocityTracker.obtain();
+        }
+        velocityTracker.addMovement(event);
+    }
+
+    private void recycleVelocityTracker() {
+        if (velocityTracker != null) {
+            velocityTracker.recycle();
+            velocityTracker = null;
+        }
+    }
+
+    private int getScrollVelocity() {
+        velocityTracker.computeCurrentVelocity(1000);
+        return (int) velocityTracker.getYVelocity();
+    }
+
+    @Override
+    public void computeScroll() {
+        if(mScroller.computeScrollOffset()){
+            scrollContentView(mScroller.getCurrY() - mContentView.getTop());
+            postInvalidate();
+        }
+    }
+
     private void scrollContentView(int offset){
+        if(offset > 0){
+            offset = Math.min(mContentView.getTop() + offset,mZoomViewHeight) - mContentView.getTop();
+        }else {
+            offset = Math.max(mContentView.getTop() + offset,0) - mContentView.getTop() ;
+        }
         mContentView.offsetTopAndBottom(offset);
     }
 

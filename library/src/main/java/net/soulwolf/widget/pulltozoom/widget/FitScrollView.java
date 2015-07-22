@@ -20,6 +20,7 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.os.Build;
 import android.util.AttributeSet;
+import android.view.MotionEvent;
 import android.widget.ScrollView;
 
 import net.soulwolf.widget.pulltozoom.Scrollable;
@@ -59,5 +60,15 @@ public class FitScrollView extends ScrollView implements Scrollable {
     @Override
     public boolean canScrollToTop() {
         return false;
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent ev) {
+        return super.onTouchEvent(ev);
+    }
+
+    @Override
+    public void scrollTo(int x, int y) {
+        super.scrollTo(x, y);
     }
 }
