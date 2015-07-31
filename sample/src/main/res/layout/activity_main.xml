@@ -10,7 +10,7 @@
         android:layout_height="?actionBarSize"
         android:background="@color/toolbar"/>
 
-    <net.soulwolf.widget.pulltozoom.PullToZoomLayout
+    <net.soulwolf.widget.pulltozoom.PullToZoomLayoutOld
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -28,5 +28,5 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>
 
-    </net.soulwolf.widget.pulltozoom.PullToZoomLayout>
+    </net.soulwolf.widget.pulltozoom.PullToZoomLayoutOld>
 </LinearLayout>
