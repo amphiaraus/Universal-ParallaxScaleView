@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     android:background="@color/default_page">
 
-    <ListView
+    <net.soulwolf.widget.parallaxlayout.widget.ParallaxListView
         android:id="@+id/list1"
         android:divider="@android:color/darker_gray"
         android:dividerHeight="0.1dp"
