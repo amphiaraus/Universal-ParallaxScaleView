@@ -23,7 +23,7 @@ import android.view.ViewGroup;
  * author : Soulwolf Create by 2015/7/22 14:59
  * email  : ToakerQin@gmail.com.
  */
-public class ViewHelper {
+public final class AnimatorHelper {
 
     public static void setScaleX(Object target,int targetValue){
         if(target instanceof View){
@@ -41,5 +41,21 @@ public class ViewHelper {
             layoutParams.height = targetValue;
             targetView.setLayoutParams(layoutParams);
         }
+    }
+
+    public static int getScaleX(Object target){
+        if(target instanceof View){
+            View targetView = (View) target;
+            return targetView.getLayoutParams().width;
+        }
+        return 0;
+    }
+
+    public static int getScaleY(Object target){
+        if(target instanceof View){
+            View targetView = (View) target;
+            return targetView.getLayoutParams().height;
+        }
+        return 0;
     }
 }

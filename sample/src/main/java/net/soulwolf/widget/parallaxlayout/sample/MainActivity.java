@@ -6,17 +6,21 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
+
+import net.soulwolf.widget.parallaxlayout.OnScalingListener;
 import net.soulwolf.widget.parallaxlayout.ParallaxLayout;
 import net.soulwolf.widget.parallaxlayout.ParallaxLayoutPresenter;
 
 
-public class MainActivity extends AppCompatActivity implements ViewPager.OnPageChangeListener {
+public class MainActivity extends AppCompatActivity implements ViewPager.OnPageChangeListener, OnScalingListener {
 
     ParallaxLayout mParallaxLayout;
 
     ViewPager  mViewPager;
 
     SimpleParallaxDelegate mSimpleParallaxDelegate;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,10 +30,15 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
         setSupportActionBar(mToolbar);
         mParallaxLayout = (ParallaxLayout) findViewById(R.id.parallax_layout);
         mViewPager = (ViewPager) findViewById(R.id.viewpager);
+        mViewPager.setOffscreenPageLimit(4);
+
         mSimpleParallaxDelegate = new SimpleParallaxDelegate(this);
         mParallaxLayout.setParallaxDelegate(mSimpleParallaxDelegate);
-        mViewPager.addOnPageChangeListener(this);
         mViewPager.setAdapter(new SimpleFragmentAdapter(getSupportFragmentManager()));
+        mSimpleParallaxDelegate.setViewPager(mViewPager);
+        mSimpleParallaxDelegate.addOnPageChangeListener(this);
+
+        mParallaxLayout.setOnScalingListener(this);
     }
 
 
@@ -72,8 +81,17 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
 
     @Override
     protected void onDestroy() {
-        mViewPager.removeOnPageChangeListener(this);
         ParallaxLayoutPresenter.onDetach(this);
         super.onDestroy();
+    }
+
+    @Override
+    public void onScaling() {
+        Toast.makeText(this,"onScaling()",Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onScaled() {
+        Toast.makeText(this,"onScaled()",Toast.LENGTH_SHORT).show();
     }
 }

@@ -22,8 +22,6 @@ import android.os.Build;
 import android.util.AttributeSet;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
 
 import com.toaker.common.tlog.TLog;
 
@@ -75,6 +73,12 @@ public class ParallaxLayout extends MasterFrameLayout implements ParallaxScrollL
         ParallaxLayoutPresenter.onAttach(context, this);
         if(DEBUG){
             TLog.i(LOG_TAG, "initialize : ParallaxLayoutPresenter.onAttach(context,this);");
+        }
+    }
+
+    public void setOnScalingListener(OnScalingListener listener) {
+        if(mParallaxDelegate != null){
+            mParallaxDelegate.setOnScalingListener(listener);
         }
     }
 

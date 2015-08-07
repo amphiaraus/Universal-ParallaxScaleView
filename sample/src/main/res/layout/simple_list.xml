@@ -8,6 +8,7 @@
         android:id="@+id/list1"
         android:divider="@android:color/darker_gray"
         android:dividerHeight="0.1dp"
+        android:overScrollMode="always"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 </FrameLayout>

@@ -19,11 +19,14 @@
 package net.soulwolf.widget.parallaxlayout.sample;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import com.astuetz.PagerSlidingTabStrip;
 import com.squareup.picasso.Picasso;
 
 import net.soulwolf.widget.parallaxlayout.ParallaxDelegate;
@@ -38,27 +41,53 @@ public class SimpleParallaxDelegate extends ParallaxDelegate {
 
     Context mContext;
 
+    PagerSlidingTabStrip mPagerSlidingTabStrip;
+
+    ViewPager mViewPager;
+
+    public void setViewPager(ViewPager viewPager){
+        this.mViewPager = viewPager;
+        this.mPagerSlidingTabStrip.setViewPager(mViewPager);
+    }
+
     public SimpleParallaxDelegate(Context context){
         this.mContext = context;
+    }
+
+    @Override
+    public void onScroll(int scrollX, int scrollY) {
+        super.onScroll(scrollX, scrollY);
+    }
+
+    @Override
+    public void setScaling(float scale, int scrollY) {
+        super.setScaling(scale, scrollY);
+        //setTranslationY(mPagerSlidingTabStrip,-scrollY);
+        //setTranslationY(mContentView,-scrollY);
     }
 
     @Override
     protected void onViewCreated(View view) {
         super.onViewCreated(view);
         mPictureView = (ImageView) findViewById(R.id.image);
+        mPagerSlidingTabStrip = (PagerSlidingTabStrip) findViewById(R.id.tab_strip);
+        mPagerSlidingTabStrip.setTextColor(Color.WHITE);
+        mPagerSlidingTabStrip.setIndicatorColor(Color.WHITE);
+        mPagerSlidingTabStrip.setShouldExpand(true);
         Picasso.with(mContext)
                 .load("http://img.zcool.cn/community/event/5360559f7ec26ac72520eee32867.jpg")
                 .into(mPictureView);
     }
 
     @Override
-    public void setScaling(float scale) {
-
+    protected View getScaleView() {
+        return findViewById(R.id.image);
     }
+
 
     @Override
     protected int getMinContentHeight() {
-        return 88;
+        return mContext.getResources().getDimensionPixelSize(R.dimen.parallax_header_tab_strip_height);
     }
 
     @Override
@@ -69,5 +98,20 @@ public class SimpleParallaxDelegate extends ParallaxDelegate {
     @Override
     public int getHeight() {
         return mContext.getResources().getDimensionPixelSize(R.dimen.parallax_header_height);
+    }
+
+    @Override
+    public int getWidth() {
+        return 1080;
+    }
+
+    /**
+     * Add a listener that will be invoked whenever the page changes or is incrementally
+     * scrolled. See {@link ViewPager.OnPageChangeListener}.
+     *
+     * @param listener listener to add
+     */
+    public void addOnPageChangeListener(ViewPager.OnPageChangeListener listener) {
+        mPagerSlidingTabStrip.setOnPageChangeListener(listener);
     }
 }

@@ -26,21 +26,110 @@ import android.view.ViewGroup;
 
 import com.nineoldandroids.view.ViewHelper;
 
+import net.soulwolf.widget.parallaxlayout.animator.AnimatorHelper;
+
 /**
  * author: Soulwolf Created on 2015/8/6 21:19.
  * email : Ching.Soulwolf@gmail.com
  */
 public abstract class ParallaxDelegate {
 
+    public static final int MIN_SCALE_VALUE = 200;
+
     protected View mContentView;
 
     protected int mMinTranslation;
 
-    public abstract void setScaling(float scale);
+    protected OnScalingListener mOnScalingListener;
+
+    protected boolean mScaling;
+
+    public void setScaling(float scale,int scrollY){
+        if(isScalable()){
+            AnimatorHelper.setScaleY(getScaleView(),Math.round(scale * getHeight()));
+            if(isChangeState(scrollY)){
+                onScaleStateChanged(true);
+            }
+        }
+    }
 
     public void onScroll(int scrollX,int scrollY){
-        System.out.println("Math.max(-scrollY, mMinTranslation) :" + Math.max(-scrollY, mMinTranslation));
-        ViewHelper.setTranslationY(mContentView, Math.max(-scrollY, mMinTranslation));
+        if(scrollY < 0 && isScalable()){
+            float scale = (getHeight() + Math.abs(scrollY)) / (float)getHeight();
+            setScaling(scale,scrollY);
+        }else {
+            resetScale(getMinScaleValue());
+           setTranslationY(mContentView, Math.max(-scrollY, mMinTranslation));
+        }
+    }
+
+    protected boolean isChangeState(float value){
+        return Math.abs(value) >= getMinScaleValue();
+    }
+
+    protected void onScaleStateChanged(boolean scaling){
+        if(scaling != mScaling){
+            mScaling = scaling;
+            if(mOnScalingListener != null){
+                if(isScaling()){
+                    mOnScalingListener.onScaling();
+                }else {
+                    mOnScalingListener.onScaled();
+                }
+            }
+        }
+    }
+
+    public boolean isScaling() {
+        return mScaling;
+    }
+
+    protected void setTranslationY(View target,float translationY){
+        ViewHelper.setTranslationY(target,translationY);
+    }
+
+    protected float getTranslationY(View view) {
+        return ViewHelper.getTranslationY(view);
+    }
+
+    protected float getScaleX(View view) {
+        return ViewHelper.getScaleX(view);
+    }
+
+    protected void setScaleX(View view, float scaleX) {
+        ViewHelper.setScaleX(view,scaleX);
+    }
+
+    protected float getScaleY(View view) {
+        return ViewHelper.getScaleY(view);
+    }
+
+    protected void setScaleY(View view, float scaleY) {
+        ViewHelper.setScaleY(view,scaleY);
+    }
+
+    protected void setPivotX(View view, float pivotX) {
+        ViewHelper.setPivotX(view, pivotX);
+    }
+
+    protected void setPivotY(View view, float pivotY) {
+        ViewHelper.setPivotY(view,pivotY);
+    }
+
+    protected boolean isScalable(){
+        return getScaleView() != null;
+    }
+
+    protected void resetScale(int offset){
+        if(isScalable()){
+            int height = getHeight();
+            if(AnimatorHelper.getScaleY(getScaleView()) != height){
+                setScaling(1.0F,0);
+            }
+            if(isChangeState(offset)){
+                onScaleStateChanged(false);
+            }
+        }
     }
 
     public void inflateHierarchy(LayoutInflater inflater,ViewGroup container){
@@ -51,11 +140,20 @@ public abstract class ParallaxDelegate {
     }
 
     protected void onViewCreated(View view){
-
+        if(isScalable()){
+            setPivotX(getScaleView(), getWidth() / 2.0f);
+            setPivotY(getScaleView(), getHeight());
+        }
     }
 
+    protected int getMinScaleValue(){
+        return MIN_SCALE_VALUE;
+    }
+
+    protected abstract View getScaleView();
+
     public int getAdjustScrollY(){
-        return (int) (getHeight() + ViewHelper.getTranslationY(mContentView));
+        return (int) (getHeight() + getTranslationY(mContentView));
     }
 
     protected View findViewById(@IdRes int id){
@@ -63,6 +161,10 @@ public abstract class ParallaxDelegate {
     }
 
     protected abstract int getMinContentHeight();
+
+    public void setOnScalingListener(OnScalingListener listener) {
+        this.mOnScalingListener = listener;
+    }
 
     public int getWidth(){
         return mContentView.getMeasuredWidth();
@@ -89,5 +191,6 @@ public abstract class ParallaxDelegate {
 
     public void onDestroy(){
         this.mContentView = null;
+        this.mOnScalingListener = null;
     }
 }
