@@ -1,8 +1,6 @@
 /**
  * <pre>
- * Copyright 2015 Soulwolf Ching
- * Copyright 2015 The Android Open Source Project for Universal-PullToZoomView
- *
+ * Copyright (C) 2015  Soulwolf Universal-ParallaxScaleView
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -18,23 +16,20 @@
  */
 package net.soulwolf.widget.parallaxlayout.widget;
 
-import android.annotation.TargetApi;
 import android.content.Context;
-import android.os.Build;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.AbsListView;
-import android.widget.ListView;
 
 import net.soulwolf.widget.parallaxlayout.ParallaxScrollListener;
 import net.soulwolf.widget.parallaxlayout.ParallaxScrollable;
 import net.soulwolf.widget.parallaxlayout.ScrollableUtils;
 
 /**
- * author: Soulwolf Created on 2015/8/6 23:18.
- * email : Ching.Soulwolf@gmail.com
+ * author : Soulwolf Create by 2015/8/7 14:03
+ * email  : ToakerQin@gmail.com.
  */
-public class ParallaxListView extends ListView implements ParallaxScrollable, AbsListView.OnScrollListener {
+public class ParallaxGridView extends GridViewWrapper implements ParallaxScrollable, AbsListView.OnScrollListener {
 
     ParallaxScrollListener mParallaxScrollListener;
 
@@ -42,25 +37,17 @@ public class ParallaxListView extends ListView implements ParallaxScrollable, Ab
 
     int mParallaxHeight;
 
-    public ParallaxListView(Context context) {
+    public ParallaxGridView(Context context) {
         super(context);
         initialize();
     }
 
-    public ParallaxListView(Context context, AttributeSet attrs) {
+    public ParallaxGridView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        initialize();
     }
 
-    public ParallaxListView(Context context, AttributeSet attrs, int defStyleAttr) {
-        super(context, attrs, defStyleAttr);
-        initialize();
-    }
-
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    public ParallaxListView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
-        super(context, attrs, defStyleAttr, defStyleRes);
-        initialize();
+    public ParallaxGridView(Context context, AttributeSet attrs, int defStyle) {
+        super(context, attrs, defStyle);
     }
 
     private void initialize() {
@@ -82,7 +69,7 @@ public class ParallaxListView extends ListView implements ParallaxScrollable, Ab
     }
 
     @Override
-    public void addAdjustView(View view,int height) {
+    public void addAdjustView(View view, int height) {
         this.mParallaxHeight = height;
         addHeaderView(view);
     }
@@ -94,6 +81,7 @@ public class ParallaxListView extends ListView implements ParallaxScrollable, Ab
 
     @Override
     public void onScrollStateChanged(AbsListView view, int scrollState) {
+
         if(mSupportOnScrollListener != null){
             mSupportOnScrollListener.onScrollStateChanged(view,scrollState);
         }

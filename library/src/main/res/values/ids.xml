@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <item name="pi_placeholder_view" type="id"/>
+    <item name="pi_header_root" type="id"/>
 </resources>
