@@ -42,4 +42,7 @@ public final class ScrollableUtils {
         return -top + firstVisiblePosition * child.getHeight() + headerHeight;
     }
 
+    public static float clamp(float value, float max, float min) {
+        return Math.max(Math.min(value, min), max);
+    }
 }

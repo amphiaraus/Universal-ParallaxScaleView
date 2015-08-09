@@ -58,4 +58,15 @@ public final class AnimatorHelper {
         }
         return 0;
     }
+
+    public static void setScale(Object target, int width,int height) {
+        if(target instanceof View) {
+            View targetView = (View)target;
+            ViewGroup.LayoutParams layoutParams = targetView.getLayoutParams();
+            layoutParams.width = width;
+            layoutParams.height = height;
+            targetView.setLayoutParams(layoutParams);
+        }
+
+    }
 }

@@ -53,13 +53,15 @@ public abstract class ParallaxDelegate {
         }
     }
 
-    public void onScroll(int scrollX,int scrollY){
+    public synchronized void onScroll(int scrollX,int scrollY){
+        System.out.println("onScroll:"+scrollY);
         if(scrollY < 0 && isScalable()){
             float scale = (getHeight() + Math.abs(scrollY)) / (float)getHeight();
             setScaling(scale,scrollY);
         }else {
-            resetScale(getMinScaleValue());
+            System.out.println("mContentView:"+Math.max(-scrollY, mMinTranslation));
            setTranslationY(mContentView, Math.max(-scrollY, mMinTranslation));
+           resetScale(getMinScaleValue());
         }
     }
 
@@ -86,6 +88,10 @@ public abstract class ParallaxDelegate {
 
     protected void setTranslationY(View target,float translationY){
         ViewHelper.setTranslationY(target,translationY);
+    }
+
+    protected void setTranslationX(View target,float translationX){
+        ViewHelper.setTranslationX(target,translationX);
     }
 
     protected float getTranslationY(View view) {

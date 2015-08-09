@@ -66,6 +66,17 @@ public class SimpleParallaxDelegate extends ParallaxDelegate {
         //setTranslationY(mContentView,-scrollY);
     }
 
+//    @Override
+//    protected boolean isScalable() {
+//        return false;
+//    }
+
+
+    @Override
+    protected void resetScale(int offset) {
+        super.resetScale(offset);
+    }
+
     @Override
     protected void onViewCreated(View view) {
         super.onViewCreated(view);
