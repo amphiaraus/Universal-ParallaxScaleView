@@ -25,6 +25,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.nineoldandroids.view.ViewHelper;
+import com.toaker.common.tlog.TLog;
 
 import net.soulwolf.widget.parallaxlayout.animator.AnimatorHelper;
 
@@ -33,6 +34,10 @@ import net.soulwolf.widget.parallaxlayout.animator.AnimatorHelper;
  * email : Ching.Soulwolf@gmail.com
  */
 public abstract class ParallaxDelegate {
+
+    static final boolean DEBUG = false;
+
+    static final String LOG_TAG = "ParallaxDelegate";
 
     public static final int MIN_SCALE_VALUE = 200;
 
@@ -46,7 +51,7 @@ public abstract class ParallaxDelegate {
 
     public void setScaling(float scale,int scrollY){
         if(isScalable()){
-            AnimatorHelper.setScaleY(getScaleView(),Math.round(scale * getHeight()));
+            AnimatorHelper.setScaleY(getScaleView(), Math.round(scale * getHeight()));
             if(isChangeState(scrollY)){
                 onScaleStateChanged(true);
             }
@@ -54,12 +59,16 @@ public abstract class ParallaxDelegate {
     }
 
     public synchronized void onScroll(int scrollX,int scrollY){
-        System.out.println("onScroll:"+scrollY);
+        if(DEBUG){
+            TLog.i(LOG_TAG,"onScroll:%s",scrollY);
+        }
         if(scrollY < 0 && isScalable()){
             float scale = (getHeight() + Math.abs(scrollY)) / (float)getHeight();
             setScaling(scale,scrollY);
         }else {
-            System.out.println("mContentView:"+Math.max(-scrollY, mMinTranslation));
+            if(DEBUG){
+                TLog.i(LOG_TAG,"mContentView:%s",Math.max(-scrollY, mMinTranslation));
+            }
            setTranslationY(mContentView, Math.max(-scrollY, mMinTranslation));
            resetScale(getMinScaleValue());
         }
