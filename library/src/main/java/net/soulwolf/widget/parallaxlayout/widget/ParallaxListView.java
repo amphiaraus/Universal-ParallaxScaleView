@@ -66,6 +66,7 @@ public class ParallaxListView extends ListView implements ParallaxScrollable, Ab
     }
 
     private void initialize() {
+        super.setOverScrollMode(OVER_SCROLL_ALWAYS);
         super.setOnScrollListener(this);
     }
 
@@ -105,14 +106,14 @@ public class ParallaxListView extends ListView implements ParallaxScrollable, Ab
     public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
         if(mParallaxScrollListener != null){
             int scrollY = ScrollableUtils.getAbsListViewScrollY(view, getHeaderViewsCount(), mParallaxHeight);
-            if(scrollY != mCacheScrollY){
+            //if(scrollY != mCacheScrollY){
                 mParallaxScrollListener.onScroll(0,scrollY);
 
             //if(mCacheScrollY != scrollY){
              //   mParallaxScrollListener.onScroll(0,scrollY);
               //  mCacheScrollY = scrollY;
 
-            }
+            //}
         }
         if(mSupportOnScrollListener != null){
             mSupportOnScrollListener.onScroll(view,firstVisibleItem,visibleItemCount,totalItemCount);
