@@ -66,7 +66,7 @@ public class ParallaxListView extends ListView implements ParallaxScrollable, Ab
     }
 
     private void initialize() {
-        super.setOverScrollMode(OVER_SCROLL_ALWAYS);
+        //super.setOverScrollMode(OVER_SCROLL_ALWAYS);
         super.setOnScrollListener(this);
     }
 
@@ -119,4 +119,12 @@ public class ParallaxListView extends ListView implements ParallaxScrollable, Ab
             mSupportOnScrollListener.onScroll(view,firstVisibleItem,visibleItemCount,totalItemCount);
         }
     }
+
+//    @Override
+//    protected boolean overScrollBy(int deltaX, int deltaY, int scrollX, int scrollY, int scrollRangeX, int scrollRangeY, int maxOverScrollX, int maxOverScrollY, boolean isTouchEvent) {
+//        if(deltaY <= 0){
+//            return false;
+//        }
+//        return super.overScrollBy(deltaX, deltaY, scrollX, scrollY, scrollRangeX, scrollRangeY, maxOverScrollX, maxOverScrollY, isTouchEvent);
+//    }
 }
